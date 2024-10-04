@@ -39,12 +39,43 @@ namespace interception
     template<typename T>
     concept Inputable = any_of<T, MouseButton, std::string, char, const char*>;
 
-    template<Inputable T>
-    INTERCEPTION_API void press(T input, int32_t times = 1, std::chrono::milliseconds interval = 50ms);
+    /**
+     * @brief Sends one or more input event of the requested key or mouse button.
+     *
+     * @tparam T Input types the api understands: string, char, const char*, MouseButton.
+     * @tparam Duration Unit of the interval duration (milliseconds, seconds, minutes...).
+     *
+     * @param input The key / mouse button to send the press events of.
+     * @param times How many times to press the given input, default 1.
+     * @param interval The duration to sleep between the individual strokes.
+     */
+    template<Inputable T, typename Duration = std::chrono::milliseconds>
+    INTERCEPTION_API void press(T input, int32_t times = 1, Duration interval = 50ms);
 
-    template<Inputable T>
-    INTERCEPTION_API void hold(T input);
 
+    /**
+     * @brief Sends a down input event of the requested key or mouse button.
+     *
+     * @tparam T Input types the api understands: string, char, const char*, MouseButton.
+     * @tparam Duration Unit of the interval duration (milliseconds, seconds, minutes...).
+     *
+     * @param input The key / mouse button to send the down event of.
+     * @param hold_for If specified, how long to hold the key until it is released.
+     *
+     * @remark If hold_for is not set (as per default), the key must be manually released.
+     */
+    template<Inputable T, typename Duration = std::chrono::milliseconds>
+    INTERCEPTION_API void hold(T input, std::optional<Duration> hold_for = std::nullopt);
+
+    /**
+     * @brief Sends an up input event of the requested key or mouse button.
+     *
+     * @tparam T Input types the api understands: string, char, const char*, MouseButton.
+     *
+     * @param input The key / mouse button to send the up event of.
+     *
+     * @remark Nothing will happen if the requested key was not previously held.
+     */
     template<Inputable T>
     INTERCEPTION_API void release(T input);
 
