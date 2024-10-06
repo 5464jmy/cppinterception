@@ -1,4 +1,4 @@
 #pragma once
-#include "inputs.h"
+#include "input.h"
 #include "listener.h"
 #include "beziercurve.h"

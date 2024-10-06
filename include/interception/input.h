@@ -3,6 +3,8 @@
 
 namespace interception
 {
+    INTERCEPTION_API bool capture_input_devices(const std::wstring& keyword = L"");
+
     /**
      * @brief Sends one or more input event of the requested key or mouse button.
      *
@@ -38,6 +40,4 @@ namespace interception
     INTERCEPTION_API void move_mouse_to(int32_t x, int32_t y);
 
     INTERCEPTION_API void write(const std::string& text);
-
-    INTERCEPTION_API void capture_devices();
 }

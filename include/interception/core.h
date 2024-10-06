@@ -8,7 +8,7 @@
 #ifdef INTERCEPTION_STATIC
 #define INTERCEPTION_API
 #else
-#define INTERCEPTION_API __declspec(dllimport)
+#define INTERCEPTION_API __declspec(dllexport)
 #endif
 
 using namespace std::chrono_literals;
