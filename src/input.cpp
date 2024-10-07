@@ -1,7 +1,8 @@
 #include "interception/input.h"
-
 #include "interception/exceptions.h"
 #include "interception_c_api/interception.h"
+
+#include "keyboard.h"
 
 namespace interception
 {
@@ -13,7 +14,7 @@ namespace interception
         [[nodiscard]] InterceptionContext get_ctx()
         {
             static InterceptionContext g_context = interception_create_context();
-            // if (!g_context) { throw interception_not_installed(); }
+            if (!g_context) { throw interception_not_installed(); }
             return g_context;
         }
     }
@@ -58,5 +59,7 @@ namespace interception
 
 int main()
 {
-    interception::capture_input_devices();
+    auto res = interception::get_key_information("win");
+
+    return 0;
 }

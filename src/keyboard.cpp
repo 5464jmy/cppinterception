@@ -75,12 +75,8 @@ namespace interception
                 }
             }
 
-            for (int32_t i = 32; i < 128; i++) {
-                vk_map[std::string(1, i)] = VkKeyScanA(i);
-            }
+            for (char i = 32; i < 128; i++) { vk_map[std::string(1, i)] = VkKeyScanA(i); }
         }
-
-
         return vk_map;
     }
 
@@ -99,10 +95,10 @@ namespace interception
             ret.shift |= mods & 0x1;
             ret.ctrl |= mods & 0x2;
             ret.alt |= mods & 0x4;
-        } catch (const std::out_of_range&) { throw std::exception(key.c_str()); }
+        } catch (const std::out_of_range&) { throw invalid_input(key); }
 
-        const int32_t scan_code = MapVirtualKeyA(ret.vk_code, MAPVK_VK_TO_VSC_EX);
-        ret.scan_code = scan_code & 0xFF;
+        const uint32_t scan_code = MapVirtualKeyA(ret.vk_code, MAPVK_VK_TO_VSC_EX);
+        ret.scan_code = static_cast<int32_t>(scan_code & 0xFF);
         ret.extended = ((scan_code >> 8) & 0xFF) & 0xE0;
         return ret;
     }
