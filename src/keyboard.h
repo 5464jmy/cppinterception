@@ -1,6 +1,9 @@
 #pragma once
+#include "interception/core.h"
+
 #include <cstdint>
-#include <string>
+
+#include "interception_c_api/interception.h"
 
 namespace interception
 {
@@ -32,4 +35,9 @@ namespace interception
      * would required a reload.
      */
     [[nodiscard]] key_data get_key_information(const std::string& key);
+
+    [[nodiscard]] std::string get_key_from_variant(const inputable_t& input);
+
+    [[nodiscard]] InterceptionKeyStroke make_stroke(const key_data& from_data,
+                                                    unsigned short state);
 }

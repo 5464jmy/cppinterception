@@ -21,6 +21,7 @@ namespace interception
     struct invalid_input final : interception_error
     {
     public:
-        explicit invalid_input(inputable_t t_input);
+        explicit invalid_input(const std::string& input);
     };
+
 }

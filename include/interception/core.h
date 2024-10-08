@@ -15,7 +15,7 @@ using namespace std::chrono_literals;
 
 namespace interception
 {
-    struct Point
+    struct point
     {
         #ifdef CV_VERSION
         Point(const cv::Point& p)

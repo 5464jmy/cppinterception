@@ -4,6 +4,11 @@
 
 #include "keyboard.h"
 
+#define CHECK_MODS(obj, action) \
+    if (obj.shift) { action("shift"); } \
+    if (obj.alt) { action("alt"); } \
+    if (obj.ctrl) { action("ctrl"); }
+
 namespace interception
 {
     namespace
@@ -16,6 +21,16 @@ namespace interception
             static InterceptionContext g_context = interception_create_context();
             if (!g_context) { throw interception_not_installed(); }
             return g_context;
+        }
+
+        [[nodiscard]] bool is_mouse_input(const inputable_t& input)
+        {
+            return std::holds_alternative<MouseButton>(input);
+        }
+
+        void send_stroke(const int32_t device, const InterceptionStroke* stroke)
+        {
+            interception_send(get_ctx(), device, stroke, 1);
         }
     }
 
@@ -54,12 +69,66 @@ namespace interception
         }
         return kb_found && mouse_found;
     }
-}
 
+    void hold(const inputable_t& input, const std::optional<ms>& duration)
+    {
+        if (is_mouse_input(input)) {
+            //
+        } else {
+            const key_data data = get_key_information(get_key_from_variant(input));
+            InterceptionKeyStroke stroke = make_stroke(data, INTERCEPTION_KEY_DOWN);
+            CHECK_MODS(data, hold);
+            send_stroke(input_keyboard, reinterpret_cast<InterceptionStroke*>(&stroke));
+        }
+        if (duration) {
+            std::this_thread::sleep_for(*duration);
+            release(input);
+        }
+    }
+
+    void release(const inputable_t& input)
+    {
+        if (is_mouse_input(input)) {
+            //
+            return;
+        }
+
+        const key_data data = get_key_information(get_key_from_variant(input));
+        InterceptionKeyStroke stroke(data.scan_code, INTERCEPTION_KEY_UP, 0);
+        if (data.extended) { stroke.information |= INTERCEPTION_KEY_E0; }
+        send_stroke(input_keyboard, reinterpret_cast<InterceptionStroke*>(&stroke));
+        CHECK_MODS(data, release);
+    }
+
+    void scroll(const ScrollDirection direction, const int32_t times)
+    {
+
+    }
+
+    void write(const std::string& text, bool randomize)
+    {
+        for (const auto& char_: text) { press(char_); }
+    }
+
+    void press(const inputable_t& input, const int32_t times, const ms duration,
+               const ms interval)
+    {
+        for (int32_t i = 0; i < times; i++) {
+            hold(input);
+            std::this_thread::sleep_for(duration);
+            release(input);
+
+            if (i > 0 && i < times - 1) { std::this_thread::sleep_for(interval); }
+        }
+    }
+}
 
 int main()
 {
-    auto res = interception::get_key_information("win");
+    interception::capture_input_devices();
 
+    interception::default_press_duration = 5ms;
+    interception::write("Hey this is a stupid test!!", true);
+    std::this_thread::sleep_for(500ms);
     return 0;
 }

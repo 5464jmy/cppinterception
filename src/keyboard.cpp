@@ -75,7 +75,9 @@ namespace interception
                 }
             }
 
-            for (char i = 32; i < 128; i++) { vk_map[std::string(1, i)] = VkKeyScanA(i); }
+            for (char i = 32; i < 127; i++) {
+                vk_map[std::string(1, i)] = VkKeyScanA(i);
+            }
         }
         return vk_map;
     }
@@ -101,5 +103,28 @@ namespace interception
         ret.scan_code = static_cast<int32_t>(scan_code & 0xFF);
         ret.extended = ((scan_code >> 8) & 0xFF) & 0xE0;
         return ret;
+    }
+
+    std::string get_key_from_variant(const inputable_t& input)
+    {
+        return std::visit([]<typename T0>(T0&& arg) -> std::string {
+            using T = std::decay_t<T0>;
+            if constexpr (std::is_same_v<T, char>) {
+                return std::string(1, arg);
+            } else if constexpr (std::is_same_v<T, std::reference_wrapper<const
+                std::string> >) {
+                return arg.get();
+            } else if constexpr (std::is_same_v<T, const char*>) {
+                return std::string(arg);
+            }
+            return "???";
+        }, input);
+    }
+
+    InterceptionKeyStroke make_stroke(const key_data& from_data,
+                                      const unsigned short state)
+    {
+        return InterceptionKeyStroke(from_data.scan_code, state,
+                                     from_data.extended ? INTERCEPTION_KEY_E0 : 0);
     }
 }

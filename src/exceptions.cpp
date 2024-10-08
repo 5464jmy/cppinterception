@@ -8,6 +8,6 @@ namespace interception
     interception_not_installed::interception_not_installed()
         : interception_error("Device initialization failed - check your installation!") {}
 
-    invalid_input::invalid_input(inputable_t t_input)
-        : interception_error(std::format("Unknown/Invalid input: {}!", t_input)) {}
+    invalid_input::invalid_input(const std::string& input)
+        : interception_error(std::format("Unknown/Invalid input: {}!", input)) {}
 }
