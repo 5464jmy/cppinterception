@@ -3,7 +3,7 @@
 
 namespace interception
 {
-    [[nodiscard]] Point get_mouse_pos();
+    [[nodiscard]] point get_mouse_pos();
 
-    [[nodiscard]] Point get_16bit_loc(const Point&);
+    [[nodiscard]] point get_16bit_loc(const point&);
 }

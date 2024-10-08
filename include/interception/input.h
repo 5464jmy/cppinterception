@@ -7,7 +7,7 @@ namespace interception
     // this provides a better way to apply it to all calls automatically.
     inline auto default_press_duration = 5ms;
 
-    inline bool randomize_press_duration = false;
+    inline bool randomize_durations = false;
 
     INTERCEPTION_API bool capture_input_devices(const std::wstring& keyword = L"");
 
@@ -42,11 +42,11 @@ namespace interception
      */
     INTERCEPTION_API void release(const inputable_t& input);
 
-    INTERCEPTION_API void scroll(ScrollDirection direction, int32_t times);
+    INTERCEPTION_API void scroll(ScrollDirection direction, int32_t times, ms interval = 5ms);
 
     INTERCEPTION_API void move_mouse_to(const point& point);
 
     INTERCEPTION_API void move_mouse_to(int32_t x, int32_t y);
 
-    INTERCEPTION_API void write(const std::string& text, bool randomize);
+    INTERCEPTION_API void write(const std::string& text);
 }

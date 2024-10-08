@@ -100,12 +100,18 @@ namespace interception
         CHECK_MODS(data, release);
     }
 
-    void scroll(const ScrollDirection direction, const int32_t times)
+    void scroll(const ScrollDirection direction, const int32_t times, const ms interval)
     {
+        const signed short scroll = direction == SCROLL_UP ? 0x78 : -0x78;
+        InterceptionMouseStroke stroke(INTERCEPTION_MOUSE_WHEEL, 0, scroll, 0, 0, 0);
 
+        for (int32_t i = 0; i < times; i++) {
+            send_stroke(input_mouse, reinterpret_cast<InterceptionStroke*>(&stroke));
+            std::this_thread::sleep_for(interval);
+        }
     }
 
-    void write(const std::string& text, bool randomize)
+    void write(const std::string& text)
     {
         for (const auto& char_: text) { press(char_); }
     }
@@ -127,8 +133,6 @@ int main()
 {
     interception::capture_input_devices();
 
-    interception::default_press_duration = 5ms;
-    interception::write("Hey this is a stupid test!!", true);
-    std::this_thread::sleep_for(500ms);
+    interception::scroll(interception::SCROLL_UP, 5, 500ms);
     return 0;
 }
