@@ -14,9 +14,18 @@ namespace interception
 {
     namespace
     {
-        InterceptionDevice input_keyboard = 1;
-        InterceptionDevice input_mouse = 11;
+        // Devices to use for input events, initially invalid. Set by capturing devices.
+        InterceptionDevice input_keyboard = -1;
+        InterceptionDevice input_mouse = -1;
 
+        /**
+         * @brief Getter for our global input context, initialization happens on the first
+         * attempt to send inputs through the context.
+         *
+         * @return The initialized interception context if the initilization succeeded.
+         *
+         * @throws interception_not_installed If the context could not be created.
+         */
         [[nodiscard]] InterceptionContext get_ctx()
         {
             static InterceptionContext g_context = interception_create_context();
@@ -24,8 +33,14 @@ namespace interception
             return g_context;
         }
 
+        /**
+         * @brief Thin wrapper to send a stroke to our context on a given device.
+         *
+         * The stroke could be a key stroke or a mouse stroke, doesnt matter to us.
+         */
         void send_stroke(const int32_t device, const InterceptionStroke* stroke)
         {
+            if (device < 0) { throw invalid_device(); }
             interception_send(get_ctx(), device, stroke, 1);
         }
     }
@@ -108,6 +123,11 @@ namespace interception
             send_stroke(input_mouse, reinterpret_cast<InterceptionStroke*>(&stroke));
             std::this_thread::sleep_for(interval);
         }
+    }
+
+    void move_mouse_to(const point& point)
+    {
+
     }
 
     void write(const std::string& text)

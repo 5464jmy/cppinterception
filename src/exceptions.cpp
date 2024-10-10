@@ -10,4 +10,7 @@ namespace interception
 
     invalid_input::invalid_input(const std::string& input)
         : interception_error(std::format("Unknown/Invalid input: {}!", input)) {}
+
+    invalid_device::invalid_device()
+        : interception_error("Device number is not valid. Determine devices first!") {}
 }

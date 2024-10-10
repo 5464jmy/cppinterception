@@ -24,4 +24,10 @@ namespace interception
         explicit invalid_input(const std::string& input);
     };
 
+    struct invalid_device final : interception_error
+    {
+    public:
+        explicit invalid_device();
+    };
+
 }

@@ -11,6 +11,13 @@ namespace interception
     // a more human timing. For example a 50ms delay may be in the range of 45ms to 55ms.
     inline bool randomize_durations = false;
 
+    /**
+     * @brief Determines both input devices (mouse and keyboard).
+     *
+     * @param keyword If provided, a keyword to find within the HWIDs to favor the device.
+     *
+     * @return Whether a valid, usable device was found for the mouse and the keyboard.
+     */
     INTERCEPTION_API bool capture_input_devices(const std::wstring& keyword = L"");
 
     /**
@@ -66,5 +73,10 @@ namespace interception
      */
     INTERCEPTION_API void scroll(ScrollDirection, int32_t times, ms interval = 5ms);
 
+    /**
+     * @brief Moves a mouse to the given point on the screen.
+     *
+     * @param point The point, consisting of (x, y) coordinates.
+     */
     INTERCEPTION_API void move_mouse_to(const point& point);
 }
