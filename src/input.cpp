@@ -3,6 +3,7 @@
 #include "interception_c_api/interception.h"
 
 #include "keyboard.h"
+#include "mouse.h"
 
 #define CHECK_MODS(obj, action) \
     if (obj.shift) { action("shift"); } \
@@ -21,11 +22,6 @@ namespace interception
             static InterceptionContext g_context = interception_create_context();
             if (!g_context) { throw interception_not_installed(); }
             return g_context;
-        }
-
-        [[nodiscard]] bool is_mouse_input(const inputable_t& input)
-        {
-            return std::holds_alternative<MouseButton>(input);
         }
 
         void send_stroke(const int32_t device, const InterceptionStroke* stroke)
@@ -72,8 +68,9 @@ namespace interception
 
     void hold(const inputable_t& input, const std::optional<ms>& duration)
     {
-        if (is_mouse_input(input)) {
-            //
+        if (const std::optional<MouseButton> btn = get_button_from_variant(input)) {
+            InterceptionMouseStroke stroke = make_stroke(*btn, true);
+            send_stroke(input_mouse, reinterpret_cast<InterceptionStroke*>(&stroke));
         } else {
             const key_data data = get_key_information(get_key_from_variant(input));
             InterceptionKeyStroke stroke = make_stroke(data, INTERCEPTION_KEY_DOWN);
@@ -88,8 +85,9 @@ namespace interception
 
     void release(const inputable_t& input)
     {
-        if (is_mouse_input(input)) {
-            //
+        if (const std::optional<MouseButton> btn = get_button_from_variant(input)) {
+            InterceptionMouseStroke stroke = make_stroke(*btn, false);
+            send_stroke(input_mouse, reinterpret_cast<InterceptionStroke*>(&stroke));
             return;
         }
 
@@ -102,6 +100,7 @@ namespace interception
 
     void scroll(const ScrollDirection direction, const int32_t times, const ms interval)
     {
+        // 0x78 is equivalent to one scroll, upwards = positive, downwards = negative.
         const signed short scroll = direction == SCROLL_UP ? 0x78 : -0x78;
         InterceptionMouseStroke stroke(INTERCEPTION_MOUSE_WHEEL, 0, scroll, 0, 0, 0);
 
@@ -133,6 +132,6 @@ int main()
 {
     interception::capture_input_devices();
 
-    interception::scroll(interception::SCROLL_UP, 5, 500ms);
+    interception::press(interception::MouseButton::MOUSE_X4);
     return 0;
 }

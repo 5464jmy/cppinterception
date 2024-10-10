@@ -107,7 +107,7 @@ namespace interception
 
     std::string get_key_from_variant(const inputable_t& input)
     {
-        return std::visit([]<typename T0>(T0&& arg) -> std::string {
+        const std::string ret = std::visit([]<typename T0>(T0&& arg) -> std::string {
             using T = std::decay_t<T0>;
             if constexpr (std::is_same_v<T, char>) {
                 return std::string(1, arg);
@@ -117,8 +117,11 @@ namespace interception
             } else if constexpr (std::is_same_v<T, const char*>) {
                 return std::string(arg);
             }
-            return "???";
+            return "";
         }, input);
+
+        if (ret.empty()) { throw std::bad_variant_access(); }
+        return ret;
     }
 
     InterceptionKeyStroke make_stroke(const key_data& from_data,

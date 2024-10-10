@@ -36,8 +36,19 @@ namespace interception
      */
     [[nodiscard]] key_data get_key_information(const std::string& key);
 
+    /**
+     * @return The keyboard key from the inputable variant.
+     */
     [[nodiscard]] std::string get_key_from_variant(const inputable_t& input);
 
+    /**
+     * @brief Makes an interception key stroke from a key data struct.
+     *
+     * @param from_data The key data struct to make the key stroke for.
+     * @param state The state the key should have, e.g up or down.
+     *
+     * @return The interception key stroke to send the event.
+     */
     [[nodiscard]] InterceptionKeyStroke make_stroke(const key_data& from_data,
                                                     unsigned short state);
 }
