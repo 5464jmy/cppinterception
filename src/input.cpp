@@ -1,5 +1,6 @@
 #include "interception/input.h"
 
+#include <random>
 #include <windows.h>
 
 #include "interception/exceptions.h"
@@ -131,6 +132,10 @@ namespace interception
 
     void move_mouse_to(const point& to)
     {
+        static std::random_device rd;
+        static std::mt19937 gen(rd());
+        static std::uniform_int_distribution delay(200, 400);
+
         POINT curr;
         GetCursorPos(&curr);
         const point from(static_cast<int32_t>(curr.x), static_cast<int32_t>(curr.y));
@@ -142,7 +147,7 @@ namespace interception
             InterceptionMouseStroke stroke(0, INTERCEPTION_MOUSE_MOVE_RELATIVE, 0, rel.x,
                                            rel.y, 0);
             send_stroke(input_mouse, reinterpret_cast<InterceptionStroke*>(&stroke));
-            std::this_thread::sleep_for(300ns);
+            std::this_thread::sleep_for(std::chrono::nanoseconds(delay(gen)));
         }
     }
 
