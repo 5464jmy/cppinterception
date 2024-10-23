@@ -17,10 +17,14 @@ namespace interception
 {
     struct point
     {
+        point(const int32_t x, const int32_t y) : x(x), y(y) {}
+
         #ifdef CV_VERSION
-        Point(const cv::Point& p)
+        explicit point(const cv::Point& p)
             : x(static_cast<int32_t>(p.x)), y(static_cast<int32_t>(p.y)) {}
         #endif
+
+        point operator-(const point& other) const { return {other.x - x, other.y - y}; }
 
         int32_t x{0};
         int32_t y{0};

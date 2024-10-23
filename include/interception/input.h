@@ -5,7 +5,7 @@ namespace interception
 {
     // Quite a common thing to have to adjust based on what you're sending inputs to,
     // this provides a better way to apply it to all calls automatically.
-    inline auto default_press_duration = 5ms;
+    inline std::chrono::milliseconds default_press_duration(5);
 
     // If enabled, the durations and intervals will get slightly randomize to emulate
     // a more human timing. For example a 50ms delay may be in the range of 45ms to 55ms.
@@ -76,7 +76,7 @@ namespace interception
     /**
      * @brief Moves a mouse to the given point on the screen.
      *
-     * @param point The point, consisting of (x, y) coordinates.
+     * @param to The point, consisting of (x, y) coordinates.
      */
-    INTERCEPTION_API void move_mouse_to(const point& point);
+    INTERCEPTION_API void move_mouse_to(const point& to);
 }

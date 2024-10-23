@@ -1,9 +1,13 @@
 #include "interception/input.h"
+
+#include <windows.h>
+
 #include "interception/exceptions.h"
 #include "interception_c_api/interception.h"
 
 #include "keyboard.h"
 #include "mouse.h"
+#include "interception/beziercurve.h"
 
 #define CHECK_MODS(obj, action) \
     if (obj.shift) { action("shift"); } \
@@ -125,9 +129,21 @@ namespace interception
         }
     }
 
-    void move_mouse_to(const point& point)
+    void move_mouse_to(const point& to)
     {
+        POINT curr;
+        GetCursorPos(&curr);
+        const point from(static_cast<int32_t>(curr.x), static_cast<int32_t>(curr.y));
+        const bezier_curve_t curve = generate_curve(from, to);
 
+        for (size_t i = 1; i < curve.size(); i++) {
+            const auto& rel = curve.at(i - 1) - curve.at(i);
+
+            InterceptionMouseStroke stroke(0, INTERCEPTION_MOUSE_MOVE_RELATIVE, 0, rel.x,
+                                           rel.y, 0);
+            send_stroke(input_mouse, reinterpret_cast<InterceptionStroke*>(&stroke));
+            std::this_thread::sleep_for(300ns);
+        }
     }
 
     void write(const std::string& text)
@@ -152,6 +168,6 @@ int main()
 {
     interception::capture_input_devices();
 
-    interception::press(interception::MouseButton::MOUSE_X4);
-    return 0;
+    interception::move_mouse_to({1551, 612});
+
 }
