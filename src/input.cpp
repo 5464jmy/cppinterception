@@ -1,14 +1,13 @@
 #include "interception/input.h"
-
-#include <random>
-#include <windows.h>
-
 #include "interception/exceptions.h"
 #include "interception_c_api/interception.h"
+#include "interception/beziercurve.h"
 
 #include "keyboard.h"
 #include "mouse.h"
-#include "interception/beziercurve.h"
+
+#include <random>
+#include <windows.h>
 
 #define CHECK_MODS(obj, action) \
     if (obj.shift) { action("shift"); } \
@@ -48,7 +47,16 @@ namespace interception
             if (device < 0) { throw invalid_device(); }
             interception_send(get_ctx(), device, stroke, 1);
         }
+
+        void set_mouse_acceleration_enabled(const bool enabled)
+        {
+            int mouse_params[3];
+            SystemParametersInfo(SPI_GETMOUSE, 0, mouse_params, 0);
+            mouse_params[2] = enabled;
+            SystemParametersInfo(SPI_SETMOUSE, 0, mouse_params, SPIF_SENDCHANGE);
+        }
     }
+
 
     bool capture_input_devices(const std::wstring& keyword)
     {
@@ -134,21 +142,27 @@ namespace interception
     {
         static std::random_device rd;
         static std::mt19937 gen(rd());
-        static std::uniform_int_distribution delay(200, 400);
+        static std::uniform_int_distribution delay(150, 225);
 
-        POINT curr;
-        GetCursorPos(&curr);
-        const point from(static_cast<int32_t>(curr.x), static_cast<int32_t>(curr.y));
-        const bezier_curve_t curve = generate_curve(from, to);
+        POINT m_pos;
+        GetCursorPos(&m_pos);
+        point curr(static_cast<int32_t>(m_pos.x), static_cast<int32_t>(m_pos.y));
+        const bezier_curve_t curve = generate_curve(curr, to);
 
-        for (size_t i = 1; i < curve.size(); i++) {
-            const auto& rel = curve.at(i - 1) - curve.at(i);
+        if (auto_disable_mouse_accel) { set_mouse_acceleration_enabled(false); }
+        for (const auto& point: curve) {
+            const auto& rel = point - curr;
+            curr = {curr.x + rel.x, curr.y + rel.y};
 
             InterceptionMouseStroke stroke(0, INTERCEPTION_MOUSE_MOVE_RELATIVE, 0, rel.x,
                                            rel.y, 0);
             send_stroke(input_mouse, reinterpret_cast<InterceptionStroke*>(&stroke));
             std::this_thread::sleep_for(std::chrono::nanoseconds(delay(gen)));
         }
+        // have to delay the acceleration disable, otherwise we get weird mouse behavior
+        // pretty sure the OS hangs behind on processing the inputs.
+        std::this_thread::sleep_for(1ms);
+        if (auto_disable_mouse_accel) { set_mouse_acceleration_enabled(false); }
     }
 
     void write(const std::string& text)
@@ -167,12 +181,4 @@ namespace interception
             if (i > 0 && i < times - 1) { std::this_thread::sleep_for(interval); }
         }
     }
-}
-
-int main()
-{
-    interception::capture_input_devices();
-
-    interception::move_mouse_to({1551, 612});
-
 }

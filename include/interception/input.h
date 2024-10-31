@@ -11,6 +11,10 @@ namespace interception
     // a more human timing. For example a 50ms delay may be in the range of 45ms to 55ms.
     inline bool randomize_durations = false;
 
+    // If enabled, mouse acceleration will be automatically disabled on rel. mouse movements.
+    // If you disable this, you must take care of it yourself or deal with the inaccuracy!
+    inline bool auto_disable_mouse_accel = false;
+
     /**
      * @brief Determines both input devices (mouse and keyboard).
      *
@@ -77,6 +81,10 @@ namespace interception
      * @brief Moves a mouse to the given point on the screen.
      *
      * @param to The point, consisting of (x, y) coordinates.
+     *
+     * @remark A bezier curve will automatically be used to move to the location.
+     * @remark The movements throughout the curve are relative.
+     *
      */
     INTERCEPTION_API void move_mouse_to(const point& to);
 }
