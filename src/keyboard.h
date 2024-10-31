@@ -34,7 +34,7 @@ namespace interception
      * @remark The result per key is automatically cached, thus changing the keyboard layout
      * would required a reload.
      */
-    [[nodiscard]] key_data get_key_information(const std::string& key);
+    [[nodiscard]] key_data get_key_information(std::string key);
 
     /**
      * @return The keyboard key from the inputable variant.

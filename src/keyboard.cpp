@@ -4,6 +4,7 @@
 #include <map>
 #include <array>
 #include <windows.h>
+#include <algorithm>
 
 namespace interception
 {
@@ -82,8 +83,12 @@ namespace interception
         return vk_map;
     }
 
-    key_data get_key_information(const std::string& key)
+    key_data get_key_information(std::string key)
     {
+        std::ranges::transform(key, key.begin(), [](const unsigned char c) {
+            return std::tolower(c);
+        });
+
         static std::map<std::string, key_data> cache;
         if (cache.contains(key)) { return cache.at(key); }
 
