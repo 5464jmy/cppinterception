@@ -1,10 +1,12 @@
 #include "interception/input.h"
-#include "interception/exceptions.h"
-#include "interception_c_api/interception.h"
-#include "interception/beziercurve.h"
 
 #include "keyboard.h"
 #include "mouse.h"
+#include "context.h"
+
+#include "interception/exceptions.h"
+#include "interception_c_api/interception.h"
+#include "interception/beziercurve.h"
 
 #include <random>
 #include <windows.h>
@@ -18,25 +20,6 @@ namespace interception
 {
     namespace
     {
-        // Devices to use for input events, initially invalid. Set by capturing devices.
-        InterceptionDevice input_keyboard = -1;
-        InterceptionDevice input_mouse = -1;
-
-        /**
-         * @brief Getter for our global input context, initialization happens on the first
-         * attempt to send inputs through the context.
-         *
-         * @return The initialized interception context if the initilization succeeded.
-         *
-         * @throws interception_not_installed If the context could not be created.
-         */
-        [[nodiscard]] InterceptionContext get_ctx()
-        {
-            static InterceptionContext g_context = interception_create_context();
-            if (!g_context) { throw interception_not_installed(); }
-            return g_context;
-        }
-
         /**
          * @brief Thin wrapper to send a stroke to our context on a given device.
          *
@@ -162,7 +145,7 @@ namespace interception
         // have to delay the acceleration disable, otherwise we get weird mouse behavior
         // pretty sure the OS hangs behind on processing the inputs.
         std::this_thread::sleep_for(1ms);
-        if (auto_disable_mouse_accel) { set_mouse_acceleration_enabled(false); }
+        if (auto_disable_mouse_accel) { set_mouse_acceleration_enabled(true); }
     }
 
     void write(const std::string& text)

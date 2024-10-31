@@ -99,9 +99,9 @@ namespace interception
             const int32_t mods = ret.vk_code / 0x100;
             ret.vk_code %= 0x100;
 
-            ret.shift |= mods & 0x1;
-            ret.ctrl |= mods & 0x2;
-            ret.alt |= mods & 0x4;
+            ret.shift |= static_cast<bool>(mods & 0x1);
+            ret.ctrl |= static_cast<bool>(mods & 0x2);
+            ret.alt |= static_cast<bool>(mods & 0x4);
         } catch (const std::out_of_range&) { throw invalid_input(key); }
 
         const uint32_t scan_code = MapVirtualKeyA(ret.vk_code, MAPVK_VK_TO_VSC_EX);
