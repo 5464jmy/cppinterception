@@ -24,7 +24,7 @@ namespace interception
             : x(static_cast<int32_t>(p.x)), y(static_cast<int32_t>(p.y)) {}
         #endif
 
-        point operator-(const point& other) const { return {other.x - x, other.y - y}; }
+        point operator-(const point& other) const { return {x - other.x, y - other.y}; }
 
         int32_t x{0};
         int32_t y{0};
