@@ -1,5 +1,6 @@
 #pragma once
 #include "core.h"
+#include "beziercurve.h"
 
 namespace interception
 {
@@ -9,7 +10,11 @@ namespace interception
 
     // If enabled, the durations and intervals will get slightly randomize to emulate
     // a more human timing. For example a 50ms delay may be in the range of 45ms to 55ms.
-    inline bool randomize_durations = false;
+    inline bool randomize_durations = true;
+
+    // The upper and lower bounds for the randomly generated factor that will be used to
+    // randomize durations if the flag is enabled.
+    inline std::pair rand_factor_bounds{0.8f, 1.2f};
 
     // If enabled, mouse acceleration will be automatically disabled on rel. mouse movements.
     // If you disable this, you must take care of it yourself or deal with the inaccuracy!
@@ -18,11 +23,13 @@ namespace interception
     /**
      * @brief Determines both input devices (mouse and keyboard).
      *
-     * @param keyword If provided, a keyword to find within the HWIDs to favor the device.
+     * @param keyboard_filter A keyword to find within the HWIDs to favor the keyboard device.
+     * @param mouse_filter A keyword to find within the HWIDs to favor the device mouse.
      *
      * @return Whether a valid, usable device was found for the mouse and the keyboard.
      */
-    INTERCEPTION_API bool capture_input_devices(const std::wstring& keyword = L"");
+    INTERCEPTION_API bool capture_input_devices(const std::wstring& keyboard_filter = L"",
+                                                const std::wstring& mouse_filter = L"");
 
     /**
      * @brief Sends one or more input event of the requested key or mouse button.
@@ -80,11 +87,19 @@ namespace interception
     /**
      * @brief Moves a mouse to the given point on the screen.
      *
-     * @param to The point, consisting of (x, y) coordinates.
+     * @param to The point to move to, consisting of (x, y) coordinates.
+     * @param curve The parameters for the curve to use for the movement, or nullptr.
      *
-     * @remark A bezier curve will automatically be used to move to the location.
-     * @remark The movements throughout the curve are relative.
-     *
+     * @remark The movements throughout the curve are of relative type.
      */
-    INTERCEPTION_API void move_mouse_to(const point& to);
+    INTERCEPTION_API void move_mouse_to(const point& to, curve_params* curve = nullptr);
+
+    /**
+     * @brief Sets the mouse position to the point on the screen.
+     *
+     * @param pos The point to set the mouse to, consisting of (x, y) coordinates.
+     *
+     * @remark The singular movement is of absolute type.
+     */
+    INTERCEPTION_API void set_mouse_pos(const point& pos);
 }
