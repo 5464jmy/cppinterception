@@ -1,12 +1,13 @@
 #pragma once
-#include <vector>
 #include "core.h"
+
+#include <vector>
 
 namespace interception
 {
     using bezier_curve_t = std::vector<point>;
 
-    struct bezier_curve_parameters final
+    struct curve_params final
     {
     public:
         int32_t knots = 2;
@@ -17,6 +18,6 @@ namespace interception
         float distortion_frequency = 0.5f;
     };
 
-    [[nodiscard]] bezier_curve_t generate_curve(const point& from, const point& to,
-                                                const bezier_curve_parameters& = {});
+    INTERCEPTION_API [[nodiscard]] bezier_curve_t generate_curve(const point& from,
+        const point& to, const curve_params& = {});
 }

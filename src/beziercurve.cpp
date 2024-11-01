@@ -88,7 +88,7 @@ namespace interception
     }
 
     bezier_curve_t generate_curve(const point& from, const point& to,
-                                  const bezier_curve_parameters& params)
+                                  const curve_params& params)
     {
         std::vector<point> knots = make_knots(from, to, params.knots);
         knots.insert(knots.begin(), from);
