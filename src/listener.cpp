@@ -5,7 +5,7 @@
 
 namespace interception
 {
-    std::array<std::wstring, 20> get_connected_device_hwids()
+    std::array<std::wstring, 20> get_connected_hwids()
     {
         std::array<std::wstring, 20> ret;
         wchar_t buff[500];

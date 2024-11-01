@@ -1,4 +1,6 @@
 #pragma once
+#include "core.h"
+
 #include <functional>
 #include <string>
 #include <array>
@@ -13,7 +15,7 @@ namespace interception
      *
      * @return An array of 20 strings representing the HWIDS of connected input devices.
      */
-    [[nodiscard]] std::array<std::wstring, 20> get_connected_device_hwids();
+    INTERCEPTION_API [[nodiscard]] std::array<std::wstring, 20> get_connected_hwids();
 
     class event_listener_thread
     {
