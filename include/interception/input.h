@@ -18,7 +18,7 @@ namespace interception
 
     // If enabled, mouse acceleration will be automatically disabled on rel. mouse movements.
     // If you disable this, you must take care of it yourself or deal with the inaccuracy!
-    inline bool auto_disable_mouse_accel = false;
+    inline bool auto_disable_mouse_accel = true;
 
     /**
      * @brief Determines both input devices (mouse and keyboard).
@@ -92,7 +92,7 @@ namespace interception
      *
      * @remark The movements throughout the curve are of relative type.
      */
-    INTERCEPTION_API void move_mouse_to(const point& to, curve_params* curve = nullptr);
+    INTERCEPTION_API void move_mouse_to(const point& to, const curve_params* curve = nullptr);
 
     /**
      * @brief Sets the mouse position to the point on the screen.

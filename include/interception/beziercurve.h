@@ -16,6 +16,9 @@ namespace interception
         float mean_distortion = 1.f;
         float stdev_distortion = 1.f;
         float distortion_frequency = 0.5f;
+
+        float delay_chance = 1.f;
+        std::chrono::nanoseconds delay = 230ns;
     };
 
     INTERCEPTION_API [[nodiscard]] bezier_curve_t generate_curve(const point& from,

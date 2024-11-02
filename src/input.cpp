@@ -58,6 +58,16 @@ namespace interception
             }
             std::this_thread::sleep_for(duration);
         }
+
+        [[nodiscard]] bool rand_bool(const float odds)
+        {
+            if (odds <= 0.f) { return false; }
+            static std::random_device rd;
+            static std::mt19937 gen(rd());
+            static std::uniform_real_distribution chance_dist(0.f, 1.f);
+
+            return chance_dist(gen) <= odds;
+        }
     }
 
     bool capture_input_devices(const std::wstring& keyboard_filter,
@@ -150,23 +160,31 @@ namespace interception
         send_stroke(input_mouse, reinterpret_cast<InterceptionStroke*>(&stroke));
     }
 
-    void move_mouse_to(const point& to, curve_params* curve)
+    void move_mouse_to(const point& to, const curve_params* curve)
     {
         POINT m_pos;
         GetCursorPos(&m_pos);
         point curr(static_cast<int32_t>(m_pos.x), static_cast<int32_t>(m_pos.y));
 
-        const bezier_curve_t points = generate_curve(curr, to);
-
+        // Do a single relative mouse movement as no curve was specified.
         if (auto_disable_mouse_accel) { set_mouse_acceleration_enabled(false); }
-        for (const auto& point: points) {
-            const auto& rel = point - curr;
-            curr = {curr.x + rel.x, curr.y + rel.y};
 
+        if (!curve) {
             InterceptionMouseStroke stroke(0, INTERCEPTION_MOUSE_MOVE_RELATIVE,
-                                           0, rel.x, rel.y, 0);
+                                           0, to.x - curr.x, to.y - curr.y, 0);
             send_stroke(input_mouse, reinterpret_cast<InterceptionStroke*>(&stroke));
-            rand_sleep(230ns);
+        } else {
+            const bezier_curve_t points = generate_curve(curr, to, *curve);
+
+            for (const auto& point: points) {
+                const auto& rel = point - curr;
+                curr = {curr.x + rel.x, curr.y + rel.y};
+
+                InterceptionMouseStroke stroke(0, INTERCEPTION_MOUSE_MOVE_RELATIVE,
+                                               0, rel.x, rel.y, 0);
+                send_stroke(input_mouse, reinterpret_cast<InterceptionStroke*>(&stroke));
+                if (rand_bool(curve->delay_chance)) { rand_sleep(curve->delay); }
+            }
         }
         // have to delay the acceleration disable, otherwise we get weird mouse behavior
         // pretty sure the OS hangs behind on processing the inputs.
